@@ -20,6 +20,13 @@ const user = new Schema({
     password: {
         type: String,
         required: [true, "Không được bỏ trống"]
+    },
+    is_verify: {
+        type: Boolean,
+        default: false
+    },
+    token: {
+        type: String
     }
 });
 
