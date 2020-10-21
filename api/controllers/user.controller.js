@@ -380,7 +380,7 @@ exports.addUser = async (req, res) => {
         email: email,
         name: name,
         is_verify: true,
-        password:password,
+        password: password,
         is_admin: is_admin
     });
     try {

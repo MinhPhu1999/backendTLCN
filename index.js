@@ -51,7 +51,7 @@ app.use(cors())
 
 userRouter(app);
 categoryRouter(app);
-brandRouter(app)
+brandRouter(app);
 productRouter(app);
 
 app.get('/', (req, res) => {res.send('welcome to fashtion_book')})

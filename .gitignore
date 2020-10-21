@@ -11,8 +11,8 @@ Desktop.ini
 # Linux
 .directory
 *~
-
-
+#file image
+files
 # npm
 node_modules
 package-lock.json
