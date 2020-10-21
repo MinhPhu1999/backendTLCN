@@ -295,3 +295,169 @@ exports.updatePassword = async (req, res) => {
     }
     res.status(200).json({msg: 'success'});
 }
+
+exports.updateUser = async (req, res) => {
+    if (typeof req.body.email === 'undefined'
+        || typeof req.body.name === 'undefined'
+        || typeof req.body.is_admin === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { email, name, is_admin } = req.body;
+    let userFind;
+    try {
+        userFind = await user.findOne({ 'email': email })
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (userFind === null) {
+        res.status(422).json({ msg: "not found" });
+        return;
+    }
+    userFind.firstName = name;
+    userFind.is_admin = is_admin;
+    try {
+        await userFind.save()
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(200).json({
+        msg: 'success', user: {
+            email: userFind.email,
+            name: userFind.name,
+            is_admin: userFind.is_admin
+        }
+    });
+}
+
+exports.deleteUser = async (req, res) => {
+    if (typeof req.body.email === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let userFind;
+    try {
+        userFind = await user.findOne({'email': req.body.email})
+    }
+    catch(err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    userFind.remove();
+    res.status(200).json({ msg: 'success'});
+}
+
+exports.addUser = async (req, res) => {
+    if ((typeof req.body.email === 'undefined')
+        || (typeof req.body.password === 'undefined')
+        || typeof req.body.name === 'undefined'
+        || typeof req.body.is_admin === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { email, password, name, is_admin } = req.body;
+    let userFind = null;
+    try {
+        userFind = await user.find({ 'email': email });
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        console.log(1)
+        return;
+    }
+    if (userFind.length > 0) {
+        res.status(409).json({ msg: 'Email already exist' });
+        return;
+    }
+    password = bcrypt.hashSync(password, 10);
+    const newUser = new user({
+        email: email,
+        name: name,
+        is_verify: true,
+        password:password,
+        is_admin: is_admin
+    });
+    try {
+        await newUser.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' });
+}
+exports.getAllUser = async(req, res) => {
+    if(typeof req.params.page === 'undefined') {
+        res.status(402).json({msg: 'Data invalid'});
+        return;
+    }
+    let count = null;
+    try { 
+        count = await user.count({});
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).json({msg: err});
+        return;
+    }
+    let totalPage = parseInt(((count - 1) / 9) + 1);
+    let { page } = req.params;
+    if ((parseInt(page) < 1) || (parseInt(page) > totalPage)) {
+        res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
+        return;
+    }
+    user.find({})
+    .skip(9 * (parseInt(page) - 1))
+    .limit(9)
+    .exec((err, docs) => {
+        if(err) {
+            console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+        }
+        res.status(200).json({ data: docs, totalPage });
+    })
+}
+exports.login = async (req, res) => {
+    if(typeof req.body.email === 'undefined'
+    || typeof req.body.password == 'undefined'){
+        res.status(402).json({msg: "Invalid data"});
+        return;
+    }
+    let { email, password } = req.body;
+    let userFind = null;
+    try{
+        userFind = await user.findOne({'email': email, 'is_admin': true});
+    }
+    catch(err){
+        res.json({msg: err});
+        return;
+    }
+    if(userFind == null){
+        res.status(422).json({msg: "Invalid data"});
+        return;
+    }
+
+    if(!userFind.is_verify){
+        res.status(401).json({msg: 'no_registration_confirmation'});
+        return;
+    }
+    
+    if(!bcrypt.compareSync(password, userFind.password)){
+        res.status(422).json({msg: 'Invalid data'});
+        return;
+    }
+    let token = jwt.sign({email: email,  iat: Math.floor(Date.now() / 1000) - 60 * 30}, 'shhhhh');
+    res.status(200).json({msg: 'success', token: token, user: {
+        email: userFind.email,
+        name: userFind.name,
+        id: userFind._id
+    }});
+}

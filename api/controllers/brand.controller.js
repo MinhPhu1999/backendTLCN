@@ -1,7 +1,7 @@
 'use strict'
 const brand = require('../models/brand.model');
 exports.getBrand = (req, res) => {
-    category.find({}, (err, docs) => {
+    brand.find({}, (err, docs) => {
         if(err) {
             console.log(err);
         } 
@@ -28,7 +28,7 @@ exports.getAll = async (req, res) => {
         res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
         return;
     }
-    category.find({})
+    brand.find({})
     .skip(9 * (parseInt(page) - 1))
     .limit(9)
     .exec((err, docs) => {
@@ -71,4 +71,66 @@ exports.getIDBySearchText = async (searchText) => {
         return;
     }
     return arr.map(i => i.id);
+}
+
+exports.addBrand = async (req, res) => {
+    if (typeof req.body.name === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { name } = req.body;
+    let brandFind;
+    try {
+        brandFind = await brand.find({ 'name': name });
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (brandFind.length > 0) {
+        res.status(409).json({ msg: 'Brand already exist' });
+        return;
+    }
+    const newBrand = new brand({ name: name });
+    try {
+        await newBrand.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' });
+}
+
+exports.updateBrand = async (req, res) => {
+    if (typeof req.body.id === 'undefined'
+        || typeof req.body.name === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { id, name } = req.body;
+    let brandFind;
+    try {
+        brandFind = await brand.findById(id);
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (brandFind === null) {
+        res.status(422).json({ msg: "not found" });
+        return;
+    }
+    brandFind.name = name;
+    try {
+        await brandFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success', brand: { name: name } });
 }
