@@ -2,27 +2,13 @@
 const product_controller = require('../controllers/product.controller');
 const multer = require('multer')
 const storage = multer.diskStorage({
-    destination: './files',
+    destination: './files/',
     filename: (req, file, cb) =>{
-        //cb(`${file.originalname}`);
-       cb(null,file.originalname);
+        let filename=`${Date.now()}-${file.originalname}`;
+       cb(null,filename);
     }
   })
-const upload = multer({ storage });
-
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-        
-//         cb(null, './files/'); //hỉnh ảnh sẽ chưa trong folder uploads
-       
-//     },
-//     filename: (req, file, cb) => {
-//         cb(null , file.originalname); ;// mặc định sẽ save name của hình ảnh
-//         // là name gốc, chúng ta có thể rename nó.  
-//     }
-// })
-
-// const upload = multer({storage:storage});
+const upload = multer({ storage:storage });
 
 
 module.exports = (app) => {

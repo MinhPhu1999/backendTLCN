@@ -35,8 +35,8 @@ exports.addProduct = async (req, res) => {
     || typeof req.body.id_brand === 'undefined' 
     || typeof req.body.descripton === 'undefined'
     ) {
-        //res.status(442).json({msg:req.body});
-        res.status(422).json({ msg: 'Invalid data' });
+        res.status(442).json({msg:req.body.data.name});
+        //res.status(422).json({ msg: 'Invalid data o day' });
         return;
     }
     const {id_category, name, price, id_brand, descripton} = req.body;
