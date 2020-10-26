@@ -16,7 +16,7 @@ const product = new Schema({
         required:[true,"Không được bỏ trống"],
         index:true
     },
-    image:{
+    img:{
         type:String,
         required:[true,"Không được bỏ trống"]
     },
@@ -25,7 +25,7 @@ const product = new Schema({
         required:[true,"Không được bỏ trống"],
         index:true
     },
-    descripton:{
+    description:{
         type:String,
         required:[true,"Không  được bỏ trống"]
     },

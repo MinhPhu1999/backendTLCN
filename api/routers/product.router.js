@@ -15,9 +15,15 @@ module.exports = (app) => {
     app.route('/product/addproduct')
         .post(upload.single('file'),product_controller.addProduct);
 
-    app.route('product/updateproduct')
+    app.route('/product/updateproduct')
         .post(upload.single('file'),product_controller.updateProduct);
-    
-    app.route('product/deleteproduct/:id')
+
+    app.route('/product/deleteproduct/:id')
         .get(product_controller.deleteProduct);
+
+    app.route('/product/getallproduct')
+        .get(product_controller.getAllProduct);
+
+    app.route('/product/updateallpricebrand/:id_brand')
+        .get(product_controller.updateAllPriceBrand);
 }

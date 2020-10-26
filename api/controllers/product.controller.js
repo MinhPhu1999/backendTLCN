@@ -33,16 +33,18 @@ exports.addProduct = async (req, res) => {
     || typeof req.body.id_category === 'undefined' 
     || typeof req.body.price === 'undefined' 
     || typeof req.body.id_brand === 'undefined' 
-    || typeof req.body.descripton === 'undefined'
+    || typeof req.body.description === 'undefined'
     ) {
-        res.status(442).json({msg:req.body.data.name});
-        //res.status(422).json({ msg: 'Invalid data o day' });
+        //res.status(442).json({msg:req.body});
+        res.status(422).json({ msg: 'Invalid data o day' });
         return;
     }
-    const {id_category, name, price, id_brand, descripton} = req.body;
+    console.log(req.body);
+    const {name, id_category, price, id_brand, description} = req.body;
     let urlImg = await uploadImg(req.file.path);
+    
     if(urlImg === false) {
-        res.status(500).json({msg: 'server error'});
+        res.status(500).json({msg: 'server error 1'});
         return;
     }
     const newProduct = new product({
@@ -51,19 +53,22 @@ exports.addProduct = async (req, res) => {
         price: price,
         id_brand: id_brand,
         img: urlImg,
-        descripton: descripton
+        description: description,
+        countInStock:1,
+        rating:5,
+        numReviews:2
     });
     try{
         newProduct.save()
     }
     catch(err) {
-        res.status(500).json({msg: 'server error'});
+        res.status(500).json({msg: 'server error 2'});
         return;
     }
-    fs.unlink(req.file.path, (err) => {
-        if (err) throw err;
-        console.log('path/file.txt was deleted');
-      });
+    // fs.unlink(req.file.path, (err) => {
+    //     if (err) throw err;
+    //     console.log('path/file.txt was deleted');
+    //   });
     res.status(201).json({msg: 'success'})
 }
 
@@ -73,12 +78,12 @@ exports.updateProduct = async (req, res) => {
     || typeof req.body.id_category === 'undefined' 
     || typeof req.body.price === 'undefined' 
     || typeof req.body.id_brand === 'undefined' 
-    || typeof req.body.descripton === 'undefined' 
+    || typeof req.body.description === 'undefined' 
     ) {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { name, id, id_category, price, id_brand, descripton} = req.body;
+    let { name, id, id_category, price, id_brand, description} = req.body;
     let productFind;
     try {
         productFind = await product.findById(id);
@@ -109,7 +114,7 @@ exports.updateProduct = async (req, res) => {
     productFind.name = name;
     productFind.price = parseFloat(price)
     productFind.id_brand = id_brand;
-    productFind.descripton = descripton;
+    productFind.description = description;
     productFind.img = urlImg;
     productFind.save((err, docs) => {
         if (err) {
@@ -123,20 +128,62 @@ exports.updateProduct = async (req, res) => {
     res.status(200).json({ msg: 'success', data: productFind });
 }
 
+
+
 exports.deleteProduct = async (req, res) => {
     if (typeof req.params.id === 'undefined') {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let productFind;
+    
     try {
-        productFind = await product.findById(req.params.id);
+        await product.findOneAndDelete(req.params.id);
     }
     catch (err) {
         console.log(err)
         res.status(500).json({ msg: err })
         return;
     }
-    productFind.remove();
     res.status(200).json({ msg: 'success', });
+}
+
+exports.getAllProduct=async(req,res)=>{
+    // if(typeof req.params.page === 'undefined') {
+    //     res.status(402).json({msg: 'Data invalid'});
+    //     return;
+    // }
+    let count = null;
+    try { 
+        count = await product.count({});
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).json({msg: err});
+        return;
+    }
+    let totalPage = parseInt(((count - 1) / 9) + 1);
+    let { page } = req.params;
+    if ((parseInt(page) < 1) || (parseInt(page) > totalPage)) {
+        res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
+        return;
+    }
+    product.find({})
+    .skip(9 * (parseInt(page) - 1))
+    .limit(9)
+    .exec((err, docs) => {
+        if(err) {
+            console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+        }
+        res.status(200).json({ data: docs, totalPage });
+    })
+}
+
+exports.updateAllPriceBrand=async(req,res)=>{
+    if(req.params.id_brand === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    
 }
