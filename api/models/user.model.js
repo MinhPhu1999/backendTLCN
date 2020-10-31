@@ -27,6 +27,9 @@ const user = new Schema({
     },
     token: {
         type: String
+    },
+    status:{
+        type:Boolean
     }
 });
 

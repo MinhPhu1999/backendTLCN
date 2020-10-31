@@ -1,19 +1,20 @@
 'use strict'
 const category = require('../models/category.model');
 exports.getCategory=(req,res)=>{
-    category.find({},(err,res)=>{
+    category.find({status:true},(err,res)=>{
         if(err){
-            console.log(err);
+            res.status(422).json({msg:err});
+            return;
         }
         res.status(200).json({data:docs});
     })
 }
 
 exports.getAll=async(req,res)=>{
-    if(typeof req.params.page === 'undefined'){
-        res.status(402).json({msg:'Data Invalid'});
-        return;
-    }
+    // if(typeof req.params.page === 'undefined'){
+    //     res.status(402).json({msg:'Data Invalid'});
+    //     return;
+    // }
     let count = null;
     try{
         count = await category.count({});
@@ -29,7 +30,7 @@ exports.getAll=async(req,res)=>{
         res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
         return;
     }
-    category.find({})
+    category.find({status:true})
     .skip(9 * (parseInt(page) - 1))
     .limit(9)
     .exec((err, docs) => {
@@ -47,7 +48,7 @@ exports.getNameByID = async (req, res) => {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let result;
+    let result = null;
     try {
         result = await category.findById(req.params.id);
     }
@@ -57,7 +58,7 @@ exports.getNameByID = async (req, res) => {
         return;
     }
     if(result === null){
-        res.status(404).json({msg: "not found"});
+        res.status(404).json({msg: "category not found"});
         return;
     }
     res.status(200).json({name: result.name});
@@ -66,7 +67,7 @@ exports.getNameByID = async (req, res) => {
 exports.getIDBySearchText = async (searchText) => {
     let arr = [];
     try {
-        arr = await category.find({name: new RegExp(searchText, "i")},{name: 0});
+        arr = await category.find({name: new RegExp(searchText)});//, "i",{name: 0}
     }
     catch (err) {
         res.status(500).json({ msg: err });
@@ -76,11 +77,12 @@ exports.getIDBySearchText = async (searchText) => {
 }
 
 exports.addCategory = async (req, res) => {
-    if (typeof req.body.name === 'undefined') {
+    if (typeof req.body.name === 'undefined'
+        || typeof req.body.path === 'undefined') {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { name } = req.body;
+    let { name, path } = req.body;
     let categoryFind;
     try {
         categoryFind = await category.find({ 'name': name });
@@ -90,10 +92,13 @@ exports.addCategory = async (req, res) => {
         return;
     }
     if (categoryFind.length > 0) {
-        res.status(409).json({ msg: 'Category already exist' });
+        res.status(409).json({ msg: 'category already exist' });
         return;
     }
-    const newCategory = new category({ name: name });
+    const newCategory = new category({ 
+        name: name,
+        path:path,
+        status:true });
     try {
         await newCategory.save();
     }
@@ -102,7 +107,7 @@ exports.addCategory = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    res.status(201).json({ msg: 'success' });
+    res.status(201).json({ msg: 'add category success' });
 }
 
 exports.updateCategory = async (req, res) => {
@@ -113,7 +118,7 @@ exports.updateCategory = async (req, res) => {
         return;
     }
     let { id, name } = req.body;
-    let categoryFind;
+    let categoryFind = null;
     try {
         categoryFind = await category.findById(id);
     }
@@ -122,7 +127,7 @@ exports.updateCategory = async (req, res) => {
         return;
     }
     if (categoryFind === null) {
-        res.status(422).json({ msg: "not found" });
+        res.status(422).json({ msg: "category not found" });
         return;
     }
     categoryFind.name = name;
@@ -134,5 +139,36 @@ exports.updateCategory = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    res.status(201).json({ msg: 'success', category: { name: name } });
+    res.status(201).json({ msg: 'update category success', category: { name: name } });
 }
+
+exports.deleteCategory = async(req,res)=>{
+    if (typeof req.params.id === "undefined") {
+        res.status(402).json({ msg: "data invalid" });
+        return;
+    }
+    let id = req.params.id;
+    let categoryFind = null;
+    try {
+        categoryFind = await category.findById(id);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "server found" });
+        return;
+    }
+    if (brandFind === null) {
+        res.status(400).json({ msg: "category not found" });
+        return;
+    }
+    categoryFind.status = false;
+    try {
+        await categoryFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(200).json({ msg: "delete success" });
+}
+

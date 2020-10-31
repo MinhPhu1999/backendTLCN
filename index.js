@@ -10,11 +10,13 @@ const categoryRouter = require('./api/routers/category.router');
 const productRouter = require('./api/routers/product.router');
 const brandRouter=require('./api/routers/brand.router');
 mongoose.Promise = global.Promise;
-const mongoURL='mongodb://localhost/e_db'
+const mongoURL='mongodb://localhost/e_db';
 mongoose.connect(mongoURL,{
     useNewUrlParser: true,
     useUnifiedTopology:true,
     useCreateIndex: true}).catch(error => console.log(error.reason));
+
+
 // const address = require('./api/models/address.vn.model');
 // const test = () => {
 //     Object.keys(data).forEach( function(k){

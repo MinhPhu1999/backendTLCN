@@ -45,6 +45,9 @@ const order=new Schema({
             
         ],
         required:true,
+    },
+    status:{
+        type:Boolean
     }
 });
 

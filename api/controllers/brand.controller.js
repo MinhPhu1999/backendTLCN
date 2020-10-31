@@ -1,45 +1,51 @@
 'use strict'
 const brand = require('../models/brand.model');
 exports.getBrand = (req, res) => {
-    brand.find({}, (err, docs) => {
+    brand.find({status:true}, (err, docs) => {
         if(err) {
-            console.log(err);
+            res.status(422).json({msg:err});
+            return;
         } 
         res.status(200).json({data:docs});
     })
 }
+
 exports.getAll = async (req, res) => {
-    if(typeof req.params.page === 'undefined') {
-        res.status(402).json({msg: 'Data invalid'});
-        return;
-    }
-    let count = null;
-    try { 
-        count = await brand.count({})
-    }
-    catch(err) {
-        console.log(err);
-        res.status(500).json({msg: err});
-        return;
-    }
-    let totalPage = parseInt(((count - 1) / 9) + 1);
-    let { page } = req.params;
-    if ((parseInt(page) < 1) || (parseInt(page) > totalPage)) {
-        res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
-        return;
-    }
-    brand.find({})
-    .skip(9 * (parseInt(page) - 1))
-    .limit(9)
-    .exec((err, docs) => {
-        if(err) {
-            console.log(err);
-                    res.status(500).json({ msg: err });
-                    return;
-        }
-        res.status(200).json({ data: docs, totalPage });
-    })
+
+
+
+    // if(typeof req.params.page === 'undefined') {
+    //     res.status(402).json({msg: 'Data invalid'});
+    //     return;
+    // }
+    // let count = null;
+    // try { 
+    //     count = await brand.count({})
+    // }
+    // catch(err) {
+    //     console.log(err);
+    //     res.status(500).json({msg: err});
+    //     return;
+    // }
+    // let totalPage = parseInt(((count - 1) / 9) + 1);
+    // let { page } = req.params;
+    // if ((parseInt(page) < 1) || (parseInt(page) > totalPage)) {
+    //     res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
+    //     return;
+    // }
+    // brand.find({status:true})
+    // .skip(9 * (parseInt(page) - 1))
+    // .limit(9)
+    // .exec((err, docs) => {
+    //     if(err) {
+    //         console.log(err);
+    //                 res.status(500).json({ msg: err });
+    //                 return;
+    //     }
+    //     res.status(200).json({ data: docs, totalPage });
+    // });
 }
+
 exports.getNameByID = async (req, res) => {
     if(req.params.id === 'undefined') {
         res.status(422).json({ msg: 'Invalid data' });
@@ -64,7 +70,7 @@ exports.getNameByID = async (req, res) => {
 exports.getIDBySearchText = async (searchText) => {
     let arr = [];
     try {
-        arr = await brand.find({name: new RegExp(searchText, "i")},{name: 0});
+        arr = await brand.find({name: new RegExp(searchText, "i")});
     }
     catch (err) {
         res.status(500).json({ msg: err });
@@ -91,7 +97,9 @@ exports.addBrand = async (req, res) => {
         res.status(409).json({ msg: 'Brand already exist' });
         return;
     }
-    const newBrand = new brand({ name: name });
+    const newBrand = new brand({ 
+        name: name,
+        status:true });
     try {
         await newBrand.save();
     }
@@ -100,7 +108,7 @@ exports.addBrand = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    res.status(201).json({ msg: 'success' });
+    res.status(201).json({ msg: 'success', data:newBrand });
 }
 
 exports.updateBrand = async (req, res) => {
@@ -133,4 +141,35 @@ exports.updateBrand = async (req, res) => {
         return;
     }
     res.status(201).json({ msg: 'success', brand: { name: name } });
+}
+
+exports.deleteBrand = async(req,res)=>{
+    if (typeof req.params.id === "undefined") {
+        res.status(402).json({ msg: "data invalid" });
+        return;
+    }
+    //console.log()
+    let id=req.params.id;
+    let brandFind = null;
+    try {
+        brandFind = await brand.findById(id);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "server found" });
+        return;
+    }
+    if (brandFind === null) {
+        res.status(400).json({ msg: "Not Found" });
+        return;
+    }
+    brandFind.status = false;
+    try {
+        await brandFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(200).json({ msg: "success" });
 }

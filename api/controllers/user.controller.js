@@ -348,7 +348,15 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    userFind.remove();
+    userFind.status=false;
+    try{
+        await userFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
     res.status(200).json({ msg: 'success'});
 }
 
@@ -381,7 +389,8 @@ exports.addUser = async (req, res) => {
         name: name,
         is_verify: true,
         password: password,
-        is_admin: is_admin
+        is_admin: is_admin,
+        status:true
     });
     try {
         await newUser.save();
@@ -392,6 +401,15 @@ exports.addUser = async (req, res) => {
         return;
     }
     res.status(201).json({ msg: 'success' });
+}
+
+exports.getUser = async(req,res)=>{
+    user.find({status:true}, (err, docs) => {
+        if(err) {
+            console.log(err);
+        } 
+        res.status(200).json({data:docs});
+    })
 }
 exports.getAllUser = async(req, res) => {
     if(typeof req.params.page === 'undefined') {
