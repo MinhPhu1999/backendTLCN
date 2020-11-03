@@ -6,6 +6,7 @@ exports.getBrand = (req, res) => {
             res.status(422).json({msg:err});
             return;
         } 
+        //console.log(typeof docs);
         res.status(200).json({data:docs});
     })
 }
@@ -85,7 +86,7 @@ exports.addBrand = async (req, res) => {
         return;
     }
     let { name } = req.body;
-    let brandFind;
+    let brandFind = null;
     try {
         brandFind = await brand.find({ 'name': name });
     }
@@ -148,7 +149,6 @@ exports.deleteBrand = async(req,res)=>{
         res.status(402).json({ msg: "data invalid" });
         return;
     }
-    //console.log()
     let id=req.params.id;
     let brandFind = null;
     try {

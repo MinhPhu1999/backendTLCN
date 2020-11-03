@@ -6,6 +6,10 @@ const cart = new Schema ({
     id_user: {
         type: String,
     },
+    // id_product:{
+    //     type:String,
+    //     required:[true,"Không được bỏ trống"]
+    // },
     date: {
         type: Date,
         default: new Date()
@@ -40,6 +44,6 @@ const cart = new Schema ({
     status:{
         type:Boolean
     }
-})
+});
 
 module.exports = mongoose.model('cart', cart);

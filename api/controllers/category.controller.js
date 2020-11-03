@@ -10,6 +10,7 @@ exports.getCategory=(req,res)=>{
     })
 }
 
+
 exports.getAll=async(req,res)=>{
     // if(typeof req.params.page === 'undefined'){
     //     res.status(402).json({msg:'Data Invalid'});

@@ -8,11 +8,10 @@ const order=new Schema({
     cart:{
         type:[
             {
-                _id:String,
                 name:String,
                 price:Number,
                 id_category:String,
-                img:String,
+                image:String,
                 id_brand:String,
                 count:Number
             }
@@ -32,33 +31,23 @@ const order=new Schema({
         $dateToString: { format: "%Y-%m-%d", date: "$date" },
         default: new Date()
     },
-    city:{
-        type: String,
-        required:[true,"Không được bỏ trống"]
-    },
-    country:{
-        type:String,
-        required:[true,"Không được bỏ trống"]
-    },
-    posteCode:{
-        type: Number,
-        required:[true,"Không được bỏ trống"]
-    },
-    phone:{
-        type:String,
-        required:[true,"Không được bỏ trống"]
-    },
-    address:{
-        type: String,
-        required:[true,"Không được bỏ trống"]
-    },
-    email:{
-        type: String,
-        required:[true,"Không được bỏ trống"]
+    shipping_address:{
+        type:[
+            {
+                city:String,
+                country:String,
+                posteCode:Number,
+                number:String,
+                phone:String,
+                address:String
+            }
+            
+        ],
+        required:true,
     },
     status:{
         type:Boolean
     }
 });
 
-module.exports = mongoose.model('order', order);
+module.exports = mongoose.model('bill', order);

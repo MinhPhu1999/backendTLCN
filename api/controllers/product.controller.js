@@ -58,7 +58,7 @@ exports.addProduct = async (req, res) => {
         status:true
     });
     try{
-        newProduct.save()
+        newProduct.save();
     }
     catch(err) {
         res.status(500).json({msg: 'add product fail'});
@@ -178,7 +178,7 @@ exports.getAllProduct=async(req,res)=>{
         res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
         return;
     }
-    product.find({})
+    product.find({status:true})
     .skip(9 * (parseInt(page) - 1))
     .limit(9)
     .exec((err, docs) => {
@@ -196,7 +196,7 @@ exports.searchProduct = async(req,res)=>{
     if (typeof req.body.searchtext !== 'undefined') {
         searchText = req.body.searchtext;
     }
-    product.find({ $or: [{ name: new RegExp(searchText, "i") }]}, (err, docs) => {
+    product.find({ $or: [{ name: new RegExp(searchText, "i"), status:true }]}, (err, docs) => {
         if(err) {
             res.status(422).json({msg:err});
             return;
@@ -282,6 +282,7 @@ exports.getProductByBrand = async(req,res)=>{
             res.status(500).json({ msg: err });
             return;
         }
+        //console.log(docs.price);
         res.status(200).json({ data: docs, totalPage });
     });
 
@@ -324,7 +325,7 @@ exports.getProductByCategory = async(req,res)=>{
     .skip(9 * (parseInt(page) - 1))
     .limit(9)
     .exec((err, docs) => {
-        if (err || docs == null) {
+        if (err) {
             console.log(err);
             res.status(500).json({ msg: err });
             return;
