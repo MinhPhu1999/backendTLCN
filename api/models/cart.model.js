@@ -6,40 +6,25 @@ const cart = new Schema ({
     id_user: {
         type: String,
     },
-    // id_product:{
-    //     type:String,
-    //     required:[true,"Không được bỏ trống"]
-    // },
+    products: {
+        type: [
+            {
+                id_category: String,
+                name: String,
+                price: Number,
+                id_brand: String,
+                img: String,
+                description: String,
+                count: Number,
+                _id: String,
+            }
+        ],
+        required : true,
+        minlength: 1,
+    },
     date: {
         type: Date,
         default: new Date()
-    },
-    name:{
-        type:String,
-        required:[true,"Không được bỏ trống"],
-        index:true
-    },
-    count:{
-        type:Number,
-        required:[true, "Không được bỏ trống"]
-    },
-    price:{
-        type:Number,
-        required:[true,"Không được bỏ trống"],
-    },
-    id_category:{
-        type:String,
-        required:[true,"Không được bỏ trống"],
-        index:true
-    },
-    img:{
-        type:String,
-        required:[true,"Không được bỏ trống"]
-    },
-    id_brand:{
-        type:String,
-        required:[true,"Không được bỏ trống"],
-        index:true
     },
     status:{
         type:Boolean

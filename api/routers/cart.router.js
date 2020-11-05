@@ -13,6 +13,9 @@ module.exports = (app) => {
     app.route('/cart/updatecart')
 		.post(cart_controller.updateCart);
 		
-    app.route('/cart/delete/:id')
-        .post(cart_controller.deleteCart);
+    app.route('/cart/delete/:id_user')
+		.put(cart_controller.deleteCart);
+		
+	app.route('/cart/remove')
+		.delete(cart_controller.deleteProductInCart);
 }
