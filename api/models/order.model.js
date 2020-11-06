@@ -56,9 +56,9 @@ const order=new Schema({
         type: String,
         required:[true,"Không được bỏ trống"]
     },
-    status:{
-        type:Boolean
-    }
+    // status:{
+    //     type:Boolean
+    // }
 });
 
 module.exports = mongoose.model('order', order);

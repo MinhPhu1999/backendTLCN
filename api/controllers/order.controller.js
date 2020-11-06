@@ -34,8 +34,7 @@ exports.addOrder = async (req, res) => {
 		posteCode:posteCode,
 		phone:phone,
 		address:address,
-		email:email,
-		status: true
+		email:email
 	});
 
 	try {

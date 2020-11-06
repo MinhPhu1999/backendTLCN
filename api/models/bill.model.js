@@ -45,9 +45,9 @@ const order=new Schema({
         ],
         required:true,
     },
-    status:{
-        type:Boolean
-    }
+    // status:{
+    //     type:Boolean
+    // }
 });
 
 module.exports = mongoose.model('bill', order);

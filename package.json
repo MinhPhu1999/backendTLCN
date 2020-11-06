@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nthanhhai2909/fashion_book_backend.git"
+    "url": "git+https://github.com/MinhPhu1999/backendTLCN.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nthanhhai2909/fashion_book_backend/issues"
+    "url": "https://github.com/MinhPhu1999/backendTLCN/issues"
   },
-  "homepage": "https://github.com/nthanhhai2909/fashion_book_backend#readme",
+  "homepage": "https://github.com/MinhPhu1999/backendTLCN#readme",
   "dependencies": {
     "bcrypt": "^5.0.0",
     "body-parser": "^1.18.2",
